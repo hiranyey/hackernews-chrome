@@ -13,7 +13,7 @@ const addStories = (stories) => {
     }
     let template = document.createElement("template");
     template.innerHTML = `<div class="story">
-      <a class="title" href="https://news.ycombinator.com/item?id=${story.objectID}">${story.title}</a> ${originalURL}
+      <a class="title" href="https://news.ycombinator.com/item?id=${story.id}">${story.title}</a> ${originalURL}
       <div>
       <span>${story.points} Points by <span><span class="author">${story.user},</span><span class="comments">${story.comment}</span>
       </div>
