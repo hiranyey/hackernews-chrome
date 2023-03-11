@@ -3,7 +3,7 @@ const storiesDiv = document.querySelector("#stories");
 const addStories = (stories) => {
   for (let index in stories) {
     const story = stories[index];
-    let originalURL;
+    let originalURL="";
     if (story.url != null) {
       try {
         originalURL = `(<a class="origin" href=${story.url}>${
