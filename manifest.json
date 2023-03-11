@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Hacker News in New Tab",
+  "version": "1.0",
+  "description": "Hacker News stories.",
+  "author": "https://github.com/hiranyey",
+  "chrome_url_overrides" : {
+    "newtab": "index.html"
+  },
+  "host_permissions": [
+    "https://hn.algolia.com/"
+  ],
+  "icons": {
+    "16": "icon.png",
+    "128": "icon.png"
+  }
+}
