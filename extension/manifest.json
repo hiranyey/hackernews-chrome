@@ -7,9 +7,6 @@
   "chrome_url_overrides" : {
     "newtab": "index.html"
   },
-  "host_permissions": [
-    "https://hn.algolia.com/"
-  ],
   "icons": {
     "16": "icon.png",
     "128": "icon.png"

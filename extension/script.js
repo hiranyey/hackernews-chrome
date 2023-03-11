@@ -15,7 +15,7 @@ const addStories = (stories) => {
     template.innerHTML = `<div class="story">
       <a class="title" href="https://news.ycombinator.com/item?id=${story.objectID}">${story.title}</a> ${originalURL}
       <div>
-      <span>${story.points} Points by <span><span class="author">${story.author},</span><span class="comments">${story.num_comments} Comments</span>
+      <span>${story.points} Points by <span><span class="author">${story.user},</span><span class="comments">${story.comment}</span>
       </div>
     </div>`;
     storiesDiv.appendChild(template.content.childNodes[0]);
@@ -32,13 +32,13 @@ if (
   if (localStorage.stories) {
     addStories(JSON.parse(localStorage.stories));
   }
-  fetch("https://hn.algolia.com/api/v1/search?tags=front_page")
+  fetch("https://hackernewschrome.fly.dev")
     .then((response) => response.json())
     .then((data) => {
       if (!localStorage.stories) {
-        addStories(data["hits"]);
+        addStories(data);
       }
-      localStorage.setItem("stories", JSON.stringify(data["hits"]));
+      localStorage.setItem("stories", JSON.stringify(data));
       localStorage.setItem("lastFetch", new Date() - 1);
     });
 }
