@@ -1,0 +1,56 @@
+.theme-light {
+  --background: hsl(33, 100%, 84%);
+  --text-color: hsl(0, 100%, 0%);
+  --visited: hsl(0, 0%, 33%);
+  --hover: hsl(33, 22%, 49%);
+}
+.theme-dark {
+  --background: hsl(33, 0%, 16%);
+  --text-color: hsl(180, 100%, 100%);
+  --visited: hsl(0, 0%, 67%);
+  --hover: hsl(33, 22%, 49%);
+}
+#stories {
+  max-width: 70%;
+  margin: auto;
+}
+.title {
+  font-size: 1.6em;
+}
+.author {
+  font-size: 1.3em;
+}
+.comments {
+  font-size: 1.3em;
+  padding-left: 8px;
+}
+.origin {
+  font-size: 1.3em;
+}
+.story {
+  padding: 0.5em;
+}
+.story:hover {
+  background-color: var(--hover);
+}
+a,span {
+  color: var(--text-color);
+}
+a:visited {
+  color: var(--visited);
+}
+body {
+  background-color: var(--background);
+  font-family: "Oswald", sans-serif;
+}
+#btn_theme {
+  position: fixed;
+  right: 3em;
+  top: 3em;
+}
+@font-face {
+  font-family: "Oswald";
+  src: url("Oswald-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}

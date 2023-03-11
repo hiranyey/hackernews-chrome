@@ -2,51 +2,12 @@
   <head>
     <meta charset="utf-8" />
     <title>New tab</title>
-    <style>
-      #stories {
-        max-width: 70%;
-        margin: auto;
-      }
-      .story {
-        padding: 0.5em;
-      }
-      .story:hover {
-        background-color: beige;
-      }
-      .title {
-        font-size: 1.8em;
-      }
-      .author {
-        font-size: 1.5em;
-      }
-      .comments {
-        font-size: 1.3em;
-        padding-left: 8px;
-      }
-      .origin {
-        font-size: 1.3em;
-        color: navy;
-      }
-      a {
-        color: black;
-      }
-      a:visited {
-        color: gray;
-      }
-      body {
-        background-color: bisque;
-        font-family: "Oswald", sans-serif;
-      }
-      @font-face {
-        font-family: "Oswald";
-        src: url("Oswald-Regular.woff") format("woff");
-        font-weight: 400;
-        font-style: normal;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <img id="btn_theme" width="36" height="36" />
     <div id="stories"></div>
+    <script src="theme-switcher.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

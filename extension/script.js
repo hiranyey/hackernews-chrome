@@ -3,22 +3,31 @@ const storiesDiv = document.querySelector("#stories");
 const addStories = (stories) => {
   for (let index in stories) {
     const story = stories[index];
-    let originalURL="";
+    let originalURL = "";
     if (story.url != null) {
       try {
-        originalURL = `(<a class="origin" href=${story.url}>${
+        originalURL = `<span class="origin">( ${
           new URL(story.url).origin
-        }</a>)`;
+        } )</span>`;
       } catch (ex) {}
     }
+    let storyURL = `https://news.ycombinator.com/item?id=${story.id}`;
+    try {
+      new URL(story.url);
+      storyURL= story.url
+    } catch (ex) {
+    }
     let template = document.createElement("template");
-    template.innerHTML = `<div class="story">
-      <a class="title" href="https://news.ycombinator.com/item?id=${story.id}">${story.title}</a> ${originalURL}
+    template.innerHTML = 
+    `<div class="story">
+      <a class="title" href=${storyURL}>${story.title}</a> ${originalURL}
       <div>
-      <span>${story.points} Points by <span><span class="author">${story.user},</span><span class="comments">${story.comment}</span>
+      <span>${story.points} Points by <span>
+      <span class="author">${story.user},</span>
+      <a class="comments" href="https://news.ycombinator.com/item?id=${story.id}">${story.comment}</a>
       </div>
     </div>`;
-    storiesDiv.appendChild(template.content.childNodes[0]);
+    storiesDiv.appendChild(template.content);
   }
 };
 
@@ -42,3 +51,8 @@ if (
       localStorage.setItem("lastFetch", new Date() - 1);
     });
 }
+document.addEventListener("click", function (e) {
+  e.preventDefault();
+  var anchor = e.target.closest("a");
+  document.location.assign(anchor.href);
+});
