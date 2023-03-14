@@ -1,1 +1,0 @@
-zip files icon.png index.html manifest.json Oswald-Regular.woff script.js
