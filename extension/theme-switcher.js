@@ -4,6 +4,11 @@ function setTheme(themeName) {
   localStorage.setItem("theme", themeName);
   document.documentElement.className = themeName;
 }
+if (localStorage.getItem("theme") === "theme-light") {
+  setTheme("theme-light");
+} else {
+  setTheme("theme-dark");
+}
 function switchTheme() {
   if (localStorage.getItem("theme") === "theme-light") {
     setTheme("theme-dark");
@@ -14,8 +19,4 @@ function switchTheme() {
 document.getElementById("btn_theme").addEventListener("click", () => {
   switchTheme();
 });
-if (localStorage.getItem("theme") === "theme-light") {
-  setTheme("theme-light");
-} else {
-  setTheme("theme-dark");
-}
+

@@ -1,36 +1,43 @@
 const storiesDiv = document.querySelector("#stories");
 
 const addStories = (stories) => {
-  for (let index in stories) {
-    const story = stories[index];
+  stories.forEach(story => {
+    
     let originalURL = "";
     if (story.url != null) {
       try {
-        originalURL = `<span class="origin">( ${
+        originalURL = `<span class="origin">${
           new URL(story.url).origin
-        } )</span>`;
+        }</span>`;
       } catch (ex) {}
     }
+    
     let storyURL = `https://news.ycombinator.com/item?id=${story.id}`;
     try {
       new URL(story.url);
       storyURL= story.url
     } catch (ex) {
     }
+
+    let hackernewURL = `https://news.ycombinator.com/item?id=${story.id}`
+    let userURL = `https://news.ycombinator.com/user?id=${story.user}`
+    
     let template = document.createElement("template");
     template.innerHTML = 
     `<div class="story">
-      <a class="title" href=${storyURL}>${story.title}</a> ${originalURL}
+      <a class="points" href=${hackernewURL}>${story.points} Points</a>
       <div>
-      <span>${story.points} Points by <span>
-      <span class="author">${story.user},</span>
-      <a class="comments" href="https://news.ycombinator.com/item?id=${story.id}">${story.comment}</a>
+        <a class="title" href=${storyURL}>${story.title}</a> ${originalURL}
+        <div>
+          <a class="comments" href=${hackernewURL}>${story.comment}</a>
+          <a class="author" href="${userURL}">${story.user}</a>
+        </div>
       </div>
     </div>`;
+    
     storiesDiv.appendChild(template.content);
-  }
+  });
 };
-
 if (
   localStorage.lastFetch &&
   localStorage.stories &&
@@ -44,15 +51,8 @@ if (
   fetch("https://hackernewschrome.fly.dev")
     .then((response) => response.json())
     .then((data) => {
-      if (!localStorage.stories) {
-        addStories(data);
-      }
+      addStories(data);
       localStorage.setItem("stories", JSON.stringify(data));
-      localStorage.setItem("lastFetch", new Date() - 1);
+      localStorage.setItem("lastFetch", new Date().getTime());
     });
 }
-document.addEventListener("click", function (e) {
-  e.preventDefault();
-  var anchor = e.target.closest("a");
-  document.location.assign(anchor.href);
-});

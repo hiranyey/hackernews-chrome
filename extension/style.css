@@ -14,35 +14,6 @@
   max-width: 70%;
   margin: auto;
 }
-.title {
-  font-size: 1.6em;
-}
-.author {
-  font-size: 1.3em;
-}
-.comments {
-  font-size: 1.3em;
-  padding-left: 8px;
-}
-.origin {
-  font-size: 1.3em;
-}
-.story {
-  padding: 0.5em;
-}
-.story:hover {
-  background-color: var(--hover);
-}
-a,span {
-  color: var(--text-color);
-}
-a:visited {
-  color: var(--visited);
-}
-body {
-  background-color: var(--background);
-  font-family: "Oswald", sans-serif;
-}
 #btn_theme {
   position: fixed;
   right: 3em;
@@ -53,4 +24,47 @@ body {
   src: url("Oswald-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
+}
+body {
+  background-color: var(--background);
+  font-family: "Oswald", sans-serif;
+}
+.story {
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+}
+.story:hover {
+  background-color: var(--hover);
+}
+.points{
+  width: 90px;
+  color: var(--text-color);
+  font-size: 1.3em;
+}
+a.points:visited {
+  color: var(--text-color);
+}
+.title {
+  font-size: 1.4em;
+}
+.author {
+  padding-left: 8px;
+  font-size: 1.3em;
+}
+a.author:visited{
+  color: var(--text-color);
+}
+.comments {
+  font-size: 1.3em; 
+}
+.origin {
+  padding-left: 8px;
+  font-size: 1.3em;
+}
+a,span {
+  color: var(--text-color);
+}
+a:visited {
+  color: var(--visited);
 }
