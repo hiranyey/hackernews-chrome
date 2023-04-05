@@ -1,8 +1,16 @@
 const storiesDiv = document.querySelector("#stories");
-
+document.addEventListener(`click`, e => {
+  const origin = e.target.closest(`a`);
+  if (origin) {
+    console.log(origin.parentNode);
+    origin.parentNode.innerHTML= "<div class='lds-dual-ring'></div>"
+    e.preventDefault()
+    window.location = origin.href
+  }
+});
 const addStories = (stories) => {
+  storiesDiv.innerHTML = ""
   stories.forEach(story => {
-    
     let originalURL = "";
     if (story.url != null) {
       try {
@@ -41,14 +49,14 @@ const addStories = (stories) => {
 if (
   localStorage.lastFetch &&
   localStorage.stories &&
-  new Date() - localStorage.lastFetch < 1000 * 120
+  new Date() - localStorage.lastFetch < 1000 * 60
 ) {
   addStories(JSON.parse(localStorage.stories));
 } else {
   if (localStorage.stories) {
     addStories(JSON.parse(localStorage.stories));
   }
-  fetch("https://hackernewschrome.fly.dev")
+  fetch("https://hn.hiranyey.dev/")
     .then((response) => response.json())
     .then((data) => {
       addStories(data);
