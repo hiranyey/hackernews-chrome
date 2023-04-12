@@ -15,16 +15,16 @@ const getHNArticles = async () => {
     let points = "0";
     try {
       points = meta.find(".score").html().replace("points", "").trim();
-    } catch (err) {}
+    } catch (err) { }
     let user = "";
     try {
       user = meta.find(".hnuser").html().replace("", "");
-    } catch (err) {}
+    } catch (err) { }
     let subtext = meta.find(".subtext").find(".subline").children("a").last();
     let comment = "0 comment";
     try {
       comment = subtext.text();
-    } catch (err) {}
+    } catch (err) { }
     result.push({
       id,
       title,
@@ -38,16 +38,23 @@ const getHNArticles = async () => {
 };
 
 let HNData = [];
-
-getHNArticles().then((data) => {
-  HNData = data;
-});
-
-setInterval(async () => {
-  console.log("Refreshed HN");
+try {
   getHNArticles().then((data) => {
     HNData = data;
   });
+} catch (err) {
+  console.log(err);
+}
+
+setInterval(async () => {
+  console.log("Refreshed HN");
+  try {
+    getHNArticles().then((data) => {
+      HNData = data;
+    });
+  } catch (err) {
+    console.log(err);
+  }
 }, 120 * 1000);
 
 const app = new Koa();
