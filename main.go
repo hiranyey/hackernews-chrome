@@ -8,8 +8,8 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/go-co-op/gocron"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Hackernews struct {
@@ -68,10 +68,10 @@ func main() {
 		}
 	})
 	scheduler.StartAsync()
-	app := fiber.New()
-	app.Use(cors.New())
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON(HNList)
+	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, HNList)
 	})
-	app.Listen(":8083")
+	e.Logger.Fatal(e.Start(":8083"))
 }
