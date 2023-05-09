@@ -1,10 +1,14 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/go-co-op/gocron"
@@ -21,17 +25,35 @@ type Hackernews struct {
 	Comment string `json:"comment"`
 }
 
+func SetLogOutput(sendToFile bool) *os.File {
+	if sendToFile {
+		logFile, err := os.OpenFile(
+			"prod.log",
+			os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+			0664,
+		)
+		if err != nil {
+			panic(err)
+		}
+		log.Logger = zerolog.New(logFile).With().Timestamp().Logger()
+		return logFile
+	} else {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+		return nil
+	}
+}
+
 func ScrapeHN() []*Hackernews {
 	HNList := []*Hackernews{}
 	resp, err := http.Get("https://news.ycombinator.com")
 	if err != nil {
-		log.Fatal(err)
+		log.Err(err).Msg("Error fetching HN page")
 		return HNList
 	}
 	defer resp.Body.Close()
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Err(err).Msg("Error parsing HN html")
 		return HNList
 	}
 	doc.Find(".athing").Each(func(i int, s *goquery.Selection) {
@@ -57,18 +79,47 @@ func ScrapeHN() []*Hackernews {
 	return HNList
 }
 
+func timeLogger(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		t := time.Now()
+		err := next(c)
+		log.Info().
+			Str("Method", string(c.Request().Method)).
+			Str("Route", c.Path()).
+			Str("Time taken", fmt.Sprintf("%d", time.Since(t).Microseconds())).
+			Msgf("Time taken")
+		return err
+	}
+}
 func main() {
+
+	sendToFile := true
+	for _, arg := range os.Args[1:] {
+		if arg == "console" {
+			sendToFile = false
+		}
+	}
+	file := SetLogOutput(sendToFile)
+	defer file.Close()
+
 	HNList := []*Hackernews{}
 
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(2).Minutes().Do(func() {
+		log.Info().Msg("Scraping HN")
 		newData := ScrapeHN()
 		if len(newData) > 0 {
 			HNList = newData
+			log.Info().Msg("Refreshed HN data")
+		} else {
+			log.Warn().Msg("HN data not refreshed")
 		}
 	})
 	scheduler.StartAsync()
+
 	e := echo.New()
+	e.Use(timeLogger)
+	e.HideBanner = true
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, HNList)

@@ -22,4 +22,5 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/go-co-op/gocron v1.25.0
 	github.com/labstack/echo/v4 v4.10.2
+	github.com/rs/zerolog v1.29.1
 )
