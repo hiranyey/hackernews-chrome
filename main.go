@@ -11,7 +11,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/go-co-op/gocron"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -103,19 +102,22 @@ func main() {
 	defer file.Close()
 
 	HNList := []*Hackernews{}
-
-	scheduler := gocron.NewScheduler(time.UTC)
-	scheduler.Every(2).Minutes().Do(func() {
-		log.Info().Msg("Scraping HN")
+	go func() {
 		newData := ScrapeHN()
 		if len(newData) > 0 {
 			HNList = newData
-			log.Info().Msg("Refreshed HN data")
-		} else {
-			log.Warn().Msg("HN data not refreshed")
 		}
-	})
-	scheduler.StartAsync()
+		for range time.Tick(time.Minute * 2) {
+			log.Info().Msg("Scraping HN")
+			newData := ScrapeHN()
+			if len(newData) > 0 {
+				HNList = newData
+				log.Info().Msg("Refreshed HN data")
+			} else {
+				log.Warn().Msg("HN data not refreshed")
+			}
+		}
+	}()
 
 	e := echo.New()
 	e.Use(timeLogger)
