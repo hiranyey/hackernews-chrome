@@ -42,8 +42,8 @@ func SetLogOutput(sendToFile bool) *os.File {
 	}
 }
 
-func ScrapeHN() []*Hackernews {
-	HNList := []*Hackernews{}
+func ScrapeHN() []Hackernews {
+	HNList := []Hackernews{}
 	resp, err := http.Get("https://news.ycombinator.com")
 	if err != nil {
 		log.Err(err).Msg("Error fetching HN page")
@@ -73,7 +73,7 @@ func ScrapeHN() []*Hackernews {
 			User:    username,
 			Comment: comments,
 		}
-		HNList = append(HNList, &newBox)
+		HNList = append(HNList, newBox)
 	})
 	return HNList
 }
@@ -90,6 +90,19 @@ func timeLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		return err
 	}
 }
+
+func writeNewHN(HNList []Hackernews) []Hackernews {
+	log.Info().Msg("Scraping HN")
+	newData := ScrapeHN()
+	if len(newData) > 0 {
+		log.Info().Msg("Refreshed HN data")
+		return newData
+	} else {
+		log.Warn().Msg("HN data not refreshed")
+		return HNList
+	}
+}
+
 func main() {
 
 	sendToFile := true
@@ -100,22 +113,10 @@ func main() {
 	}
 	file := SetLogOutput(sendToFile)
 	defer file.Close()
-
-	HNList := []*Hackernews{}
+	HNList := writeNewHN([]Hackernews{})
 	go func() {
-		newData := ScrapeHN()
-		if len(newData) > 0 {
-			HNList = newData
-		}
 		for range time.Tick(time.Minute * 2) {
-			log.Info().Msg("Scraping HN")
-			newData := ScrapeHN()
-			if len(newData) > 0 {
-				HNList = newData
-				log.Info().Msg("Refreshed HN data")
-			} else {
-				log.Warn().Msg("HN data not refreshed")
-			}
+			HNList = writeNewHN(HNList)
 		}
 	}()
 
