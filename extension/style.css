@@ -1,5 +1,5 @@
 .theme-light {
-  --background: hsl(0, 0%, 95%);
+  --background: hsl(0, 7%, 92%);
   --text-color: hsl(0, 0%, 20%);
   --visited: hsl(0, 0%, 50%);
   --hover: hsl(0, 0%, 80%);
@@ -35,8 +35,8 @@
 body {
   background-color: var(--background);
   font-family: "Oswald", sans-serif;
-  font-size: 1.1em;
   /* Increased base font size */
+  font-size: 0.9em;
   line-height: 1.6;
   /* Adjusted line height */
   letter-spacing: 0.01em;
@@ -73,7 +73,8 @@ body {
   margin-right: 1em;
   /* Added spacing */
   color: var(--text-color);
-  font-size: 1em;
+  font-size: 0.9em;
+  letter-spacing: 1px;
   /* Reduced font size */
   font-weight: bold;
   /* Made points bold */
@@ -85,7 +86,7 @@ a.points:visited {
 }
 
 .title {
-  font-size: 1.4em;
+  font-size: 1.26em;
   /* Increased font size */
   text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.1);
   /* Added subtle text shadow */
@@ -101,7 +102,7 @@ a.points:visited {
 .author {
   padding-left: 0;
   /* Removed padding */
-  font-size: 0.9em;
+  font-size: 0.81em;
   /* Reduced font size */
 }
 
@@ -111,14 +112,15 @@ a.author:visited {
 
 .comments {
   width: 100px;
-  font-size: 0.9em;
+  font-size: 0.81em;
+  letter-spacing: 0.5px;
   /* Reduced font size */
 }
 
 .origin {
   padding-left: 0.5em;
   /* Adjusted padding */
-  font-size: 0.9em;
+  font-size: 0.81em;
   /* Reduced font size */
   color: var(--visited);
   /* Muted color */
