@@ -2,8 +2,7 @@ const storiesDiv = document.querySelector("#stories");
 document.addEventListener(`click`, e => {
   const origin = e.target.closest(`a`);
   if (origin) {
-    console.log(origin.parentNode);
-    origin.parentNode.innerHTML= "<div class='lds-dual-ring'></div>"
+    origin.parentNode.innerHTML = "<div class='lds-dual-ring'></div>"
     e.preventDefault()
     window.location = origin.href
   }
@@ -14,35 +13,34 @@ const addStories = (stories) => {
     let originalURL = "";
     if (story.url != null) {
       try {
-        originalURL = `<span class="origin">${
-          new URL(story.url).origin
-        }</span>`;
-      } catch (ex) {}
+        originalURL = `<span class="origin">(${new URL(story.url).origin
+          })</span>`;
+      } catch (ex) { }
     }
-    
+
     let storyURL = `https://news.ycombinator.com/item?id=${story.id}`;
     try {
       new URL(story.url);
-      storyURL= story.url
+      storyURL = story.url
     } catch (ex) {
     }
 
     let hackernewURL = `https://news.ycombinator.com/item?id=${story.id}`
     let userURL = `https://news.ycombinator.com/user?id=${story.user}`
-    
+
     let template = document.createElement("template");
-    template.innerHTML = 
-    `<div class="story">
-      <a class="points" href=${hackernewURL}>${story.points} Points</a>
-      <div>
-        <a class="title" href=${storyURL}>${story.title}</a> ${originalURL}
-        <div>
+    template.innerHTML =
+      `<div class="story">
+        <div class="story-header">
+          <a class="points" href=${hackernewURL}>${story.points} points</a>
+          <a class="title" href=${storyURL}>${story.title}</a>${originalURL}
+        </div>
+        <div class="story-footer">
           <a class="comments" href=${hackernewURL}>${story.comment}</a>
           <a class="author" href="${userURL}">${story.user}</a>
         </div>
-      </div>
-    </div>`;
-    
+      </div>`;
+
     storiesDiv.appendChild(template.content);
   });
 };

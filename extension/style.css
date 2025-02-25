@@ -1,72 +1,146 @@
 .theme-light {
-  --background: hsl(33, 100%, 84%);
-  --text-color: hsl(0, 100%, 0%);
-  --visited: hsl(0, 0%, 33%);
-  --hover: hsl(33, 22%, 49%);
+  --background: hsl(0, 0%, 95%);
+  --text-color: hsl(0, 0%, 20%);
+  --visited: hsl(0, 0%, 50%);
+  --hover: hsl(0, 0%, 80%);
+  --border-color: hsl(0, 0%, 85%);
 }
+
 .theme-dark {
-  --background: hsl(33, 0%, 16%);
-  --text-color: hsl(180, 100%, 100%);
-  --visited: hsl(0, 0%, 67%);
-  --hover: hsl(33, 22%, 49%);
+  --background: hsl(0, 0%, 20%);
+  --text-color: hsl(0, 0%, 95%);
+  --visited: hsl(0, 0%, 70%);
+  --hover: hsl(0, 0%, 30%);
+  --border-color: hsl(0, 0%, 30%);
 }
+
 #stories {
   max-width: 70%;
   margin: auto;
 }
+
 #btn_theme {
   position: fixed;
   right: 3em;
   top: 3em;
 }
+
 @font-face {
   font-family: "Oswald";
   src: url("Oswald-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
 }
+
 body {
   background-color: var(--background);
   font-family: "Oswald", sans-serif;
+  font-size: 1.1em;
+  /* Increased base font size */
+  line-height: 1.6;
+  /* Adjusted line height */
+  letter-spacing: 0.01em;
+  /* Added subtle letter spacing */
+  transition: background-color 0.3s ease;
 }
+
 .story {
   display: flex;
-  align-items: center;
-  padding: 0.5em;
+  flex-direction: column;
+  /* Changed to column */
+  padding: 0.75em;
+  border-bottom: 1px solid var(--border-color);
+  /* Added border */
 }
+
+.story:last-child {
+  border-bottom: none;
+}
+
 .story:hover {
   background-color: var(--hover);
 }
-.points{
-  width: 90px;
-  color: var(--text-color);
-  font-size: 1.3em;
+
+.story-header {
+  display: flex;
+  align-items: center;
 }
+
+.points {
+  width: 100px;
+  /* Adjusted width */
+  min-width: 70px;
+  margin-right: 1em;
+  /* Added spacing */
+  color: var(--text-color);
+  font-size: 1em;
+  /* Reduced font size */
+  font-weight: bold;
+  /* Made points bold */
+  text-align: left;
+}
+
 a.points:visited {
   color: var(--text-color);
 }
+
 .title {
-  font-size: 1.6em;
+  font-size: 1.4em;
+  /* Increased font size */
+  text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.1);
+  /* Added subtle text shadow */
+  transition: color 0.2s ease-in-out;
+  /* Added transition */
 }
+
+.title:hover {
+  color: #007bff;
+  /* Added hover color */
+}
+
 .author {
-  padding-left: 8px;
-  font-size: 1.3em;
+  padding-left: 0;
+  /* Removed padding */
+  font-size: 0.9em;
+  /* Reduced font size */
 }
-a.author:visited{
+
+a.author:visited {
   color: var(--text-color);
 }
+
 .comments {
-  font-size: 1.3em; 
+  width: 100px;
+  font-size: 0.9em;
+  /* Reduced font size */
 }
+
 .origin {
-  padding-left: 8px;
-  font-size: 1.3em;
+  padding-left: 0.5em;
+  /* Adjusted padding */
+  font-size: 0.9em;
+  /* Reduced font size */
+  color: var(--visited);
+  /* Muted color */
 }
-a,span {
+
+a,
+span {
   color: var(--text-color);
 }
+
 a:visited {
   color: var(--visited);
+}
+
+.story-footer {
+  margin-top: 0.25em;
+  display: flex;
+  align-items: center;
+}
+
+.story-footer a {
+  margin-right: 1em;
 }
 
 .lds-dual-ring {
@@ -74,6 +148,7 @@ a:visited {
   width: 64px;
   height: 64px;
 }
+
 .lds-dual-ring:after {
   content: " ";
   display: block;
@@ -85,10 +160,12 @@ a:visited {
   border-color: #fff transparent #fff transparent;
   animation: lds-dual-ring 1.2s linear infinite;
 }
+
 @keyframes lds-dual-ring {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

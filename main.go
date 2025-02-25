@@ -1,18 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
+	"log/slog"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-
 	"github.com/PuerkitoBio/goquery"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 type Hackernews struct {
@@ -24,35 +20,17 @@ type Hackernews struct {
 	Comment string `json:"comment"`
 }
 
-func SetLogOutput(sendToFile bool) *os.File {
-	if sendToFile {
-		logFile, err := os.OpenFile(
-			"prod.log",
-			os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-			0664,
-		)
-		if err != nil {
-			panic(err)
-		}
-		log.Logger = zerolog.New(logFile).With().Timestamp().Logger()
-		return logFile
-	} else {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-		return nil
-	}
-}
-
 func ScrapeHN() []Hackernews {
 	HNList := []Hackernews{}
 	resp, err := http.Get("https://news.ycombinator.com")
 	if err != nil {
-		log.Err(err).Msg("Error fetching HN page")
+		slog.Error("Error fetching HN page", "error", err)
 		return HNList
 	}
 	defer resp.Body.Close()
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		log.Err(err).Msg("Error parsing HN html")
+		slog.Error("Error parsing HN html", "error", err)
 		return HNList
 	}
 	doc.Find(".athing").Each(func(i int, s *goquery.Selection) {
@@ -78,41 +56,19 @@ func ScrapeHN() []Hackernews {
 	return HNList
 }
 
-func timeLogger(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		t := time.Now()
-		err := next(c)
-		log.Info().
-			Str("Method", string(c.Request().Method)).
-			Str("Route", c.Path()).
-			Str("Time taken", fmt.Sprintf("%d", time.Since(t).Microseconds())).
-			Msgf("Time taken")
-		return err
-	}
-}
-
 func writeNewHN(HNList []Hackernews) []Hackernews {
-	log.Info().Msg("Scraping HN")
+	slog.Info("Scraping HN")
 	newData := ScrapeHN()
 	if len(newData) > 0 {
-		log.Info().Msg("Refreshed HN data")
+		slog.Info("Refreshed HN data")
 		return newData
 	} else {
-		log.Warn().Msg("HN data not refreshed")
+		slog.Warn("HN data not refreshed")
 		return HNList
 	}
 }
 
 func main() {
-
-	sendToFile := true
-	for _, arg := range os.Args[1:] {
-		if arg == "console" {
-			sendToFile = false
-		}
-	}
-	file := SetLogOutput(sendToFile)
-	defer file.Close()
 	HNList := writeNewHN([]Hackernews{})
 	go func() {
 		for range time.Tick(time.Minute * 2) {
@@ -120,12 +76,26 @@ func main() {
 		}
 	}()
 
-	e := echo.New()
-	e.Use(timeLogger)
-	e.HideBanner = true
-	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
-	e.GET("/", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, HNList)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(HNList)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			slog.Error("Error encoding JSON", "error", err)
+			return
+		}
 	})
-	e.Logger.Fatal(e.Start(":8083"))
+
+	slog.Info("Starting server", "port", ":8083")
+	log.Fatal(http.ListenAndServe(":8083", nil))
 }
