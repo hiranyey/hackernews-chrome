@@ -33,11 +33,11 @@ const addStories = (stories) => {
       `<div class="story">
         <div class="story-header">
           <a class="points" href=${hackernewURL}>${story.points} points</a>
-          <a class="title" href=${storyURL}>${story.title}</a>${originalURL}
+          <a class="title" href=${storyURL}>${story.title}<span class="url">${originalURL}</span></a>
         </div>
         <div class="story-footer">
+          <a class="author" href="${userURL}">${story.user.slice(0, 10)}</a>
           <a class="comments" href=${hackernewURL}>${story.comment}</a>
-          <a class="author" href="${userURL}">${story.user}</a>
         </div>
       </div>`;
 

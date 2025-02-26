@@ -25,29 +25,19 @@
   top: 3em;
 }
 
-@font-face {
-  font-family: "Oswald";
-  src: url("Oswald-Regular.woff") format("woff");
-  font-weight: 400;
-  font-style: normal;
-}
 
 body {
   background-color: var(--background);
-  font-family: "Oswald", sans-serif;
   /* Increased base font size */
   font-size: 0.9em;
-  line-height: 1.6;
-  /* Adjusted line height */
-  letter-spacing: 0.01em;
-  /* Added subtle letter spacing */
+  line-height: 1.2;
   transition: background-color 0.3s ease;
 }
 
 .story {
   display: flex;
   flex-direction: column;
-  /* Changed to column */
+
   padding: 0.75em;
   border-bottom: 1px solid var(--border-color);
   /* Added border */
@@ -63,20 +53,13 @@ body {
 
 .story-header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
 }
 
 .points {
-  width: 100px;
-  /* Adjusted width */
   min-width: 70px;
-  margin-right: 1em;
   /* Added spacing */
   color: var(--text-color);
-  font-size: 0.9em;
-  letter-spacing: 1px;
-  /* Reduced font size */
-  font-weight: bold;
   /* Made points bold */
   text-align: left;
 }
@@ -100,7 +83,7 @@ a.points:visited {
 }
 
 .author {
-  padding-left: 0;
+  width: 70px;
   /* Removed padding */
   font-size: 0.81em;
   /* Reduced font size */
@@ -111,7 +94,6 @@ a.author:visited {
 }
 
 .comments {
-  width: 100px;
   font-size: 0.81em;
   letter-spacing: 0.5px;
   /* Reduced font size */
@@ -138,12 +120,13 @@ a:visited {
 .story-footer {
   margin-top: 0.25em;
   display: flex;
-  align-items: center;
+
 }
 
-.story-footer a {
-  margin-right: 1em;
+.url {
+  font-size: 0.9em;
 }
+
 
 .lds-dual-ring {
   display: inline-block;
