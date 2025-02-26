@@ -25,10 +25,9 @@
   top: 3em;
 }
 
-
 body {
   background-color: var(--background);
-  /* Increased base font size */
+  font-family: "Slabo 27px", serif;
   font-size: 0.9em;
   line-height: 1.2;
   transition: background-color 0.3s ease;
@@ -57,7 +56,7 @@ body {
 }
 
 .points {
-  min-width: 70px;
+  min-width: 80px;
   /* Added spacing */
   color: var(--text-color);
   /* Made points bold */
@@ -83,7 +82,7 @@ a.points:visited {
 }
 
 .author {
-  width: 70px;
+  width: 80px;
   /* Removed padding */
   font-size: 0.81em;
   /* Reduced font size */
