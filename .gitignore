@@ -1,3 +1,5 @@
-main
-hackernews-chrome
-.aider*
+.venv
+uv.lock
+__pycache__/
+*.pyc
+*.pyo   
