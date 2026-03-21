@@ -1,0 +1,27 @@
+{
+  "name": "hackernews-chrome",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:hiranyey/hackernews-chrome.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "cheerio": "^1.2.0",
+    "escape-html": "^1.0.3",
+    "fastify": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/escape-html": "^1.0.4",
+    "@types/node": "^25.5.0"
+  }
+}

@@ -1,21 +1,19 @@
-FROM python:3.14-slim
+# Use a slim, production-ready base image for a smaller size
+FROM node:25-alpine
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+# Copy package.json and package-lock.json first to leverage Docker's layer caching for dependencies
+COPY package*.json .
 
-# Copy dependency files
-COPY pyproject.toml uv.lock* ./
+# Install production dependencies only
+RUN npm ci --omit=dev
+COPY index.ts .
 
-# Install dependencies
-RUN uv sync --no-cache
-
-# Copy application code
-COPY main.py ./
-
-# Expose port
+# Expose the port the app runs on (change if necessary)
 EXPOSE 8000
 
-# Run with uvicorn
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Define the command to start the application
+CMD ["node", "index.ts"] 
+# If you have a start script in package.json, you can use: CMD ["npm", "start"]
