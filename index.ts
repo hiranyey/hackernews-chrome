@@ -52,11 +52,11 @@ async function fetchHN() {
     return frontPageNews;
 }
 
-let news: News[] = [];
+let news: string = "";
 const refreshHN = () => {
     fetchHN().then((data) => {
         console.log("Refreshed HN data");
-        news = data;
+        news = JSON.stringify(data);
     })
 }
 refreshHN();
@@ -71,7 +71,9 @@ fastify.register(cors, {
     origin: '*',
 });
 fastify.get('/', async function handler(request, reply) {
-    return news;
+    reply.code(200)
+    .header('Content-Type', 'application/json; charset=utf-8')
+    .send(news)
 })
 try {
     await fastify.listen({ port: 8000, host: '0.0.0.0' })
