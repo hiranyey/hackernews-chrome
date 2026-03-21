@@ -27,6 +27,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: api.repoflow.io/hiranyeyg-6713/hackernews-chrome/server:${{ github.sha::7 }}
+          tags: api.repoflow.io/hiranyeyg-6713/hackernews-chrome/server:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
