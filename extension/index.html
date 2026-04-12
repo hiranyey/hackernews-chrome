@@ -1,19 +1,37 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight">
 <head>
   <meta charset="utf-8" />
-  <title>New tab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>New Tab</title>
+  <script>document.documentElement.dataset.theme = localStorage.getItem('hn-theme') || 'midnight';</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500&family=Nunito:wght@400;600&family=Fira+Code&family=IBM+Plex+Sans:wght@400;600&family=Lora:wght@400;700&family=Quicksand:wght@500;600&family=Space+Grotesk:wght@400;500&family=VT323&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
-  <style>
-    @import url('Slabo.ttf');
-  </style>
 </head>
-
 <body>
-  <img id="btn_theme" width="36" height="36" />
-  <div id="stories"></div>
+  <div id="controls">
+    <button id="saved-btn" aria-label="Saved stories">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span id="saved-count"></span>
+    </button>
+    <div id="theme-picker-wrap">
+      <button id="theme-btn" aria-label="Change theme">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <circle cx="4" cy="4" r="2.5"/>
+          <circle cx="12" cy="4" r="2.5"/>
+          <circle cx="4" cy="12" r="2.5"/>
+          <circle cx="12" cy="12" r="2.5"/>
+        </svg>
+      </button>
+      <div id="theme-panel"></div>
+    </div>
+  </div>
+  <main id="stories"></main>
   <script src="theme-switcher.js"></script>
   <script src="script.js"></script>
 </body>
-
 </html>
