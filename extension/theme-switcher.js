@@ -1,9 +1,10 @@
 // Ordered as dark/light pairs so the 2-column grid puts dark on left, light on right
 const THEMES = [
+
   {
-    id: "midnight",
-    name: "Midnight",
-    colors: ["#0f172a", "#e2e8f0", "#38bdf8", "#1e293b"],
+    id: "catppuccin",
+    name: "Catppuccin",
+    colors: ["#1e1e2e", "#cdd6f4", "#cba6f7", "#313244"],
   },
   {
     id: "paper",
@@ -31,9 +32,9 @@ const THEMES = [
     colors: ["#fff0f6", "#3d1f33", "#e91e8c", "#ffffff"],
   },
   {
-    id: "rose-pine",
-    name: "Rosé Pine",
-    colors: ["#191724", "#e0def4", "#ebbcba", "#1f1d2e"],
+    id: "dracula",
+    name: "Dracula",
+    colors: ["#282a36", "#f8f8f2", "#ff79c6", "#44475a"],
   },
   {
     id: "lavender",
@@ -97,5 +98,5 @@ document.addEventListener("keydown", (e) => {
 });
 
 // Initialize with saved theme or default
-const saved = localStorage.getItem("hn-theme") || "midnight";
+const saved = localStorage.getItem("hn-theme") || "catppuccin";
 applyTheme(saved);
