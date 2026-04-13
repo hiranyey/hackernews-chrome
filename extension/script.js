@@ -1,3 +1,47 @@
+// ========== FONT SIZE SLIDER ==========
+
+(function () {
+  var defaultSize = 18.75;
+  var saved = localStorage.getItem("hn-font-size");
+  var size = saved ? parseFloat(saved) : defaultSize;
+  document.documentElement.style.fontSize = size + "px";
+
+  var slider = document.getElementById("size-slider");
+  var btn = document.getElementById("size-btn");
+  var panel = document.getElementById("size-panel");
+  var isOpen = false;
+
+  slider.value = size;
+
+  slider.addEventListener("input", function () {
+    var val = parseFloat(slider.value);
+    document.documentElement.style.fontSize = val + "px";
+    localStorage.setItem("hn-font-size", val);
+  });
+
+  btn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    isOpen = !isOpen;
+    panel.classList.toggle("open", isOpen);
+  });
+
+  document.addEventListener("click", function (e) {
+    if (isOpen && !panel.contains(e.target)) {
+      isOpen = false;
+      panel.classList.remove("open");
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && isOpen) {
+      isOpen = false;
+      panel.classList.remove("open");
+    }
+  });
+})();
+
+// ========== MAIN ==========
+
 const storiesDiv = document.querySelector("#stories");
 const storyMap = new Map();
 let currentView = "feed";

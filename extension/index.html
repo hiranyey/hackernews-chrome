@@ -4,11 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>New Tab</title>
-  <script>document.documentElement.dataset.theme = localStorage.getItem('hn-theme') || 'dracula';</script>
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem('hn-theme') || 'dracula';
+    var s = localStorage.getItem('hn-font-size');
+    if (s) document.documentElement.style.fontSize = s + 'px';
+  </script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="controls">
+    <div id="size-picker-wrap">
+      <button id="size-btn" aria-label="Adjust text size">Aa</button>
+      <div id="size-panel">
+        <span class="size-label">A</span>
+        <input type="range" id="size-slider" min="12" max="24" step="1" />
+        <span class="size-label size-label-lg">A</span>
+      </div>
+    </div>
     <button id="saved-btn" aria-label="Saved stories">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>

@@ -332,6 +332,106 @@ a:hover {
 }
 
 /* ========================================
+   SIZE PICKER
+   ======================================== */
+
+#size-picker-wrap {
+  position: relative;
+}
+
+#size-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+#size-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+  color: var(--text);
+}
+
+#size-btn:active {
+  transform: scale(0.95);
+}
+
+#size-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(-4px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+#size-panel.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.size-label {
+  color: var(--text-secondary);
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  user-select: none;
+}
+
+.size-label-lg {
+  font-size: 0.9rem;
+}
+
+#size-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+
+#size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+#size-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* ========================================
    SAVED BUTTON
    ======================================== */
 
