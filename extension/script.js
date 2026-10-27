@@ -47,6 +47,40 @@ const storyMap = new Map();
 let currentView = "feed";
 let currentStories = [];
 
+// ========== LEGACY DATA MIGRATION ==========
+
+// Stories from the old "/" endpoint were HTML-escaped by the server. They are
+// now rendered with textContent, so decode any stored copies once.
+(function () {
+  if (localStorage.getItem("hn-data-version") === "2") return;
+
+  function decode(str) {
+    if (typeof str !== "string") return str;
+    // DOMParser documents are inert: nothing in them runs or loads
+    return new DOMParser().parseFromString(str, "text/html").documentElement
+      .textContent;
+  }
+
+  try {
+    var saved = JSON.parse(localStorage.getItem("hn-saved") || "[]");
+    var decoded = saved.map(function (story) {
+      return {
+        id: decode(story.id),
+        title: decode(story.title),
+        url: decode(story.url),
+        points: decode(story.points),
+        user: decode(story.user),
+        comment: decode(story.comment),
+      };
+    });
+    localStorage.setItem("hn-saved", JSON.stringify(decoded));
+  } catch (ex) {}
+
+  localStorage.removeItem("stories");
+  localStorage.removeItem("lastFetch");
+  localStorage.setItem("hn-data-version", "2");
+})();
+
 // ========== VISITED TRACKING ==========
 
 function getVisited() {
@@ -107,6 +141,33 @@ var bookmarkOutline =
 var bookmarkFilled =
   '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
 
+// ========== DOM HELPERS ==========
+
+function createEl(tag, className, text) {
+  var el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+function createLink(className, href, text) {
+  var a = createEl("a", className, text);
+  a.href = href;
+  return a;
+}
+
+// Only allow http(s) links so a story can't smuggle in javascript: URLs
+function safeURL(url) {
+  try {
+    var parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:"
+      ? parsed.href
+      : "";
+  } catch (ex) {
+    return "";
+  }
+}
+
 // ========== RENDER ==========
 
 var addStories = function (stories, savedView) {
@@ -139,63 +200,43 @@ var addStories = function (stories, savedView) {
       } catch (ex) {}
     }
 
-    var storyURL = "https://news.ycombinator.com/item?id=" + story.id;
-    try {
-      new URL(story.url);
-      storyURL = story.url;
-    } catch (ex) {}
-
-    var hnURL = "https://news.ycombinator.com/item?id=" + story.id;
-    var userURL = "https://news.ycombinator.com/user?id=" + story.user;
+    var hnURL =
+      "https://news.ycombinator.com/item?id=" + encodeURIComponent(story.id);
+    var userURL =
+      "https://news.ycombinator.com/user?id=" + encodeURIComponent(story.user);
+    var storyURL = safeURL(story.url) || hnURL;
     var saved = isSaved(story.id);
 
-    var el = document.createElement("div");
-    el.className = "story";
+    var el = createEl("div", "story");
     el.dataset.id = story.id;
     if (visited.has(story.id)) el.classList.add("story-visited");
 
-    el.innerHTML =
-      '<span class="story-rank">' +
-      (i + 1) +
-      ".</span>" +
-      '<div class="story-body">' +
-      '<div class="story-header">' +
-      '<a class="story-title" href="' +
-      storyURL +
-      '">' +
-      story.title +
-      "</a>" +
-      (domain ? '<span class="story-domain">(' + domain + ")</span>" : "") +
-      "</div>" +
-      '<div class="story-meta">' +
-      '<a class="story-points" href="' +
-      hnURL +
-      '">' +
-      story.points +
-      " pts</a>" +
-      '<span class="sep">&middot;</span>' +
-      '<a class="story-author" href="' +
-      userURL +
-      '">' +
-      story.user +
-      "</a>" +
-      '<span class="sep">&middot;</span>' +
-      '<a class="story-comments" href="' +
-      hnURL +
-      '">' +
-      story.comment +
-      "</a>" +
-      "</div>" +
-      "</div>" +
-      '<button class="story-save' +
-      (saved ? " saved" : "") +
-      '" data-id="' +
-      story.id +
-      '" aria-label="' +
-      (saved ? "Unsave" : "Save") +
-      '">' +
-      (saved ? bookmarkFilled : bookmarkOutline) +
-      "</button>";
+    var header = createEl("div", "story-header");
+    header.appendChild(createLink("story-title", storyURL, story.title));
+    if (domain) {
+      header.appendChild(createEl("span", "story-domain", "(" + domain + ")"));
+    }
+
+    var meta = createEl("div", "story-meta");
+    meta.appendChild(createLink("story-points", hnURL, story.points + " pts"));
+    meta.appendChild(createEl("span", "sep", "·"));
+    meta.appendChild(createLink("story-author", userURL, story.user));
+    meta.appendChild(createEl("span", "sep", "·"));
+    meta.appendChild(createLink("story-comments", hnURL, story.comment));
+
+    var body = createEl("div", "story-body");
+    body.appendChild(header);
+    body.appendChild(meta);
+
+    var saveBtn = createEl("button", "story-save" + (saved ? " saved" : ""));
+    saveBtn.dataset.id = story.id;
+    saveBtn.setAttribute("aria-label", saved ? "Unsave" : "Save");
+    // Static SVG constants, no story data
+    saveBtn.innerHTML = saved ? bookmarkFilled : bookmarkOutline;
+
+    el.appendChild(createEl("span", "story-rank", i + 1 + "."));
+    el.appendChild(body);
+    el.appendChild(saveBtn);
 
     storiesDiv.appendChild(el);
   });
@@ -266,8 +307,9 @@ if (
     currentStories = JSON.parse(localStorage.stories);
     addStories(currentStories, false);
   }
-  fetch("https://hn.hiranyey.dev/")
+  fetch("https://hn.hiranyey.dev/v2")
     .then(function (response) {
+      if (!response.ok) throw new Error("HTTP " + response.status);
       return response.json();
     })
     .then(function (data) {
@@ -277,5 +319,9 @@ if (
       }
       localStorage.setItem("stories", JSON.stringify(data));
       localStorage.setItem("lastFetch", new Date().getTime());
+    })
+    .catch(function (err) {
+      // Keep showing cached stories, if any
+      console.error("Failed to fetch stories:", err);
     });
 }
