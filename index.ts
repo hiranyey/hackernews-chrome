@@ -2,6 +2,12 @@ import * as cheerio from 'cheerio';
 import escapeHTML from 'escape-html';
 import Fastify, { type FastifyReply } from 'fastify'
 import cors from '@fastify/cors'
+import net from 'node:net'
+
+// HN publishes both A and AAAA records. Node's default 250ms per-address
+// connect window is shorter than the round trip from distant hosts, so every
+// attempt gets abandoned and fetch fails with AggregateError [ETIMEDOUT].
+net.setDefaultAutoSelectFamilyAttemptTimeout(2000);
 
 const HN_URL = "https://news.ycombinator.com/";
 const REFRESH_INTERVAL_MS = 2 * 60 * 1000;
