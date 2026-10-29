@@ -1,0 +1,242 @@
+[
+  {
+    "id": "50289418",
+    "title": "We're releasing the weights of Mistral Large 4",
+    "url": "https://mistral.ai/news/mistral-large-4-oss/",
+    "points": "607",
+    "user": "kuberwastaken",
+    "comment": "154 comments"
+  },
+  {
+    "id": "50291945",
+    "title": "For the first time ever, Google Search is less than 50% of Alphabet's revenue",
+    "url": "https://www.kadoa.com/companies/insights/google-search-below-half",
+    "points": "90",
+    "user": "hubraumhugo",
+    "comment": "43 comments"
+  },
+  {
+    "id": "50291054",
+    "title": "H.264 Is Magic (2016)",
+    "url": "https://sidbala.com/h-264-is-magic/",
+    "points": "97",
+    "user": "ea016",
+    "comment": "37 comments"
+  },
+  {
+    "id": "50290912",
+    "title": "Grace Blackwell needs a new scheduler: 27% more usable GPUs from the same racks",
+    "url": "https://skypilot.ai/blog/grace-blackwell-needs-a-new-scheduler",
+    "points": "47",
+    "user": "wondersky",
+    "comment": "2 comments"
+  },
+  {
+    "id": "50290283",
+    "title": "Zombie stats: Where the numbers AI quotes come from",
+    "url": "https://trakkr.ai/trakkr-research/zombie-stats",
+    "points": "72",
+    "user": "mektrik",
+    "comment": "34 comments"
+  },
+  {
+    "id": "50287919",
+    "title": "DoorDash to acquire Instacart",
+    "url": "https://about.doordash.com/en-us/news/doordash-to-acquire-instacart",
+    "points": "215",
+    "user": "WalterSobchak",
+    "comment": "394 comments"
+  },
+  {
+    "id": "50290668",
+    "title": "Mexico is a showroom for electric vehicles you can't buy in the U.S.",
+    "url": "https://www.washingtonpost.com/climate-environment/2026/10/27/i-saw-future-driving-mexico-its-off-limits-americans/",
+    "points": "132",
+    "user": "bookofjoe",
+    "comment": "96 comments"
+  },
+  {
+    "id": "50286987",
+    "title": "Chained PHP2Shell Exploit Roots 25 Servers, Including US Government Servers",
+    "url": "https://dreamgroup.com/blog/chained-php2shell-exploit-roots-25-servers",
+    "points": "163",
+    "user": "882542F3884314B",
+    "comment": "71 comments"
+  },
+  {
+    "id": "50292233",
+    "title": "Tomas Mikolov (creator of Word2Vec) receives the Medal of Merit",
+    "url": "https://www.vut.cz/en/but/news-f19528/two-but-graduates-received-state-honors-from-the-president-of-the-republic-d378468",
+    "points": "7",
+    "user": "armcat",
+    "comment": "discuss"
+  },
+  {
+    "id": "50287775",
+    "title": "If IPv4 were land",
+    "url": "https://iptrust.co/blog/if-ipv4-were-land",
+    "points": "142",
+    "user": "rokostik",
+    "comment": "133 comments"
+  },
+  {
+    "id": "50278645",
+    "title": "noalloc: Tooling and libraries to enforce zero heap allocations in Golang",
+    "url": "https://github.com/theconsensuslabs/noalloc",
+    "points": "18",
+    "user": "g0xA52A2A",
+    "comment": "1 comment"
+  },
+  {
+    "id": "50291116",
+    "title": "Launch HN: Simantic (YC F26) – Firmware Simulation for AI Agents",
+    "url": "https://news.ycombinator.com/item?id=50291116",
+    "points": "14",
+    "user": "shong0504",
+    "comment": "8 comments"
+  },
+  {
+    "id": "50290177",
+    "title": "LLM Voice",
+    "url": "https://martinfowler.com/bliki/LLM-Voice.html",
+    "points": "35",
+    "user": "ibobev",
+    "comment": "7 comments"
+  },
+  {
+    "id": "50287448",
+    "title": "How Google determines the names for bodies of water in Google Earth",
+    "url": "https://publicpolicy.googleblog.com/2008/04/how-google-determines-names-for-bodies.html",
+    "points": "171",
+    "user": "terminalbraid",
+    "comment": "133 comments"
+  },
+  {
+    "id": "50289590",
+    "title": "Keplearn: Extract Equations from Data in Seconds",
+    "url": "https://github.com/owls-on-wires/keplearn",
+    "points": "39",
+    "user": "owls-on-wires",
+    "comment": "1 comment"
+  },
+  {
+    "id": "50287599",
+    "title": "NetBSD adds a new text editor called atto",
+    "url": "https://mastodon.sdf.org/@netbsd/117518160563539748",
+    "points": "100",
+    "user": "luke8086",
+    "comment": "91 comments"
+  },
+  {
+    "id": "50282838",
+    "title": "Qwenputer: A functioning, deterministic RISC-V CPU inside Qwen3.5",
+    "url": "https://divagr.com/blog/qwenputer",
+    "points": "659",
+    "user": "csmantle",
+    "comment": "139 comments"
+  },
+  {
+    "id": "50242509",
+    "title": "Java's new AOT cache feature is in a rough state",
+    "url": "https://xpipe.io/blog/java-aot-cache",
+    "points": "65",
+    "user": "theanonymousone",
+    "comment": "19 comments"
+  },
+  {
+    "id": "50291421",
+    "title": "16colo.rs – ANSI/ASCII art archive",
+    "url": "https://16colo.rs/",
+    "points": "12",
+    "user": "memalign",
+    "comment": "discuss"
+  },
+  {
+    "id": "50285452",
+    "title": "Zero click, silent, remote Android DoS",
+    "url": "https://smsofdeath.com/",
+    "points": "271",
+    "user": "MarkBlah",
+    "comment": "153 comments"
+  },
+  {
+    "id": "50276998",
+    "title": "Why is this fingerprinting script creating bioweapons?",
+    "url": "https://nullpt.rs/fingerprinting-bioweapons",
+    "points": "1497",
+    "user": "hazebooth",
+    "comment": "281 comments"
+  },
+  {
+    "id": "50261595",
+    "title": "Everything Rhymes with Porcelain",
+    "url": "https://worksinprogress.co/issue/everything-rhymes-with-porcelain/",
+    "points": "6",
+    "user": "cromulent",
+    "comment": "1 comment"
+  },
+  {
+    "id": "50291927",
+    "title": "Toxic Experts",
+    "url": "https://nedbatchelder.com/blog/201711/toxic_experts",
+    "points": "6",
+    "user": "luu",
+    "comment": "discuss"
+  },
+  {
+    "id": "50274893",
+    "title": "Newly discovered Kerberos delegation abuse path",
+    "url": "https://hunio.org/security/abusing-constrained-delegation-without-protocol-transition-against-spn-less-accounts/",
+    "points": "11",
+    "user": "hunio",
+    "comment": "1 comment"
+  },
+  {
+    "id": "50243757",
+    "title": "Getting debug access on a Brother printer over Telnet",
+    "url": "https://inventor7777.github.io/blog/2026/10/22/debug-access-on-brother/",
+    "points": "157",
+    "user": "inventor7777",
+    "comment": "47 comments"
+  },
+  {
+    "id": "50288019",
+    "title": "Gemini 4 Carbon is the new #1 on the Artificial Analysis Intelligence Index v5",
+    "url": "https://artificialanalysis.ai/articles/gemini-4-carbon-new-number-1",
+    "points": "298",
+    "user": "theHocineSaad",
+    "comment": "224 comments"
+  },
+  {
+    "id": "50287001",
+    "title": "The US added a record 20.2 GWh of battery storage in just 3 months",
+    "url": "https://electrek.co/2026/08/31/the-us-added-a-record-20-2-gwh-of-battery-storage-in-just-3-months/",
+    "points": "243",
+    "user": "ljf",
+    "comment": "155 comments"
+  },
+  {
+    "id": "50287898",
+    "title": "Hackers expose the identities of more than 40k DHS employees",
+    "url": "https://text.npr.org/nx-s1-6021497",
+    "points": "222",
+    "user": "firefax",
+    "comment": "50 comments"
+  },
+  {
+    "id": "50285319",
+    "title": "Forging a Microsoft Edge Full Chain with Logic Bugs Only",
+    "url": "https://blog.orange.tw/posts/2026-10-the-last-proof-of-human-craft-browser-full-chain/",
+    "points": "211",
+    "user": "austinallegro",
+    "comment": "37 comments"
+  },
+  {
+    "id": "50253100",
+    "title": "Southern Africa's first known stenciled rock art found hiding in plain sight",
+    "url": "https://phys.org/news/2026-10-southern-africa-stenciled-art-plain.html",
+    "points": "36",
+    "user": "wglb",
+    "comment": "7 comments"
+  }
+]

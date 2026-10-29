@@ -1,0 +1,29 @@
+{
+  "name": "hackernews-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Worker backend for the Hacker News new-tab extension.",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --format=esm --platform=neutral --target=es2022 --outfile=dist/worker.js --legal-comments=none",
+    "fixtures": "node scripts/generate-expected.mjs",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
+    "types": "wrangler types --include-runtime false",
+    "pretest": "npm run build",
+    "test": "vitest run --config vitest.node.config.ts && vitest run --config vitest.config.ts",
+    "test:node": "vitest run --config vitest.node.config.ts",
+    "test:worker": "vitest run --config vitest.config.ts"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.10",
+    "@cloudflare/workers-types": "^5.20261029.1",
+    "@types/escape-html": "^1.0.4",
+    "@types/node": "^22.19.0",
+    "cheerio": "1.2.0",
+    "esbuild": "^0.25.0",
+    "escape-html": "1.0.3",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.155.0"
+  }
+}

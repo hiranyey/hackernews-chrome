@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "hackernews-backend",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-29",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    }
+  },
+  "triggers": {
+    "crons": ["*/2 * * * *"]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "HN_KV",
+      // Placeholder. Create the namespace with `npx wrangler kv namespace create HN_KV`
+      // and replace this id before deploying.
+      "id": "00000000000000000000000000000000"
+    }
+  ]
+  // Custom domain hn.hiranyey.dev, after the zone is on this account:
+  // "routes": [{ "pattern": "hn.hiranyey.dev", "custom_domain": true }]
+}

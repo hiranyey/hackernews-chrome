@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "AT&T says \"hi\" <ok>",
+    "url": "https://example.com/a?b=1&c=2",
+    "points": "12",
+    "user": "alice",
+    "comment": "3 comments"
+  },
+  {
+    "id": "2",
+    "title": "Ask HN: What's a good \"editor\"?",
+    "url": "https://news.ycombinator.com/item?id=2",
+    "points": "4",
+    "user": "bob",
+    "comment": "discuss"
+  },
+  {
+    "id": "50280824",
+    "title": "Nango (YC W23) Is Hiring Across Eng, FDE, Marketing, DevRel",
+    "url": "https://nango.dev/careers",
+    "points": "",
+    "user": "",
+    "comment": ""
+  },
+  {
+    "id": "4",
+    "title": "Do not run",
+    "url": "",
+    "points": "1",
+    "user": "eve",
+    "comment": "1 comment"
+  },
+  {
+    "id": "5",
+    "title": "Mail",
+    "url": "",
+    "points": "",
+    "user": "",
+    "comment": ""
+  },
+  {
+    "id": "6",
+    "title": "",
+    "url": "https://news.ycombinator.com/",
+    "points": "",
+    "user": "",
+    "comment": ""
+  }
+]
