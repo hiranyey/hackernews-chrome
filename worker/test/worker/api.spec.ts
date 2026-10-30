@@ -4,13 +4,51 @@ import {
   waitOnExecutionContext,
 } from "cloudflare:test";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import edgeHtml from "../../fixtures/edge-cases.html?raw";
 import { KV_ESCAPED, KV_META, KV_RAW, type News } from "../../src/constants.ts";
 import worker from "../../src/index.ts";
 import { escapeNews } from "../../src/parse.ts";
 import { resetRefreshStateForTests } from "../../src/refresh.ts";
 
 const originalFetch = globalThis.fetch;
+
+const HN_TOP_URL = "https://hacker-news.firebaseio.com/v0/topstories.json";
+const HN_ITEM_PREFIX = "https://hacker-news.firebaseio.com/v0/item/";
+
+const sampleItem = {
+  id: 1,
+  type: "story",
+  by: "alice",
+  title: `AT&T says "hi" <ok>`,
+  url: "https://example.com/a?b=1&c=2",
+  score: 12,
+  descendants: 3,
+};
+
+function requestUrl(input: RequestInfo | URL): string {
+  if (typeof input === "string") return input;
+  if (input instanceof URL) return input.href;
+  return input.url;
+}
+
+function firebaseFetch(onCall?: () => Promise<void> | void): typeof fetch {
+  return async (input) => {
+    await onCall?.();
+    const url = requestUrl(input);
+    if (url === HN_TOP_URL) {
+      return new Response(JSON.stringify([sampleItem.id]), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    if (url === `${HN_ITEM_PREFIX}${sampleItem.id}.json`) {
+      return new Response(JSON.stringify(sampleItem), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    throw new Error(`unexpected outbound fetch ${url}`);
+  };
+}
 
 async function emptyKv(): Promise<void> {
   const listed = await env.HN_KV.list();
@@ -62,14 +100,10 @@ describe("fetch handler", () => {
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
-    globalThis.fetch = async () => {
+    globalThis.fetch = firebaseFetch(async () => {
       calls += 1;
       await gate;
-      return new Response(edgeHtml, {
-        status: 200,
-        headers: { "content-type": "text/html" },
-      });
-    };
+    });
 
     const ctx1 = createExecutionContext();
     const ctx2 = createExecutionContext();
@@ -104,15 +138,15 @@ describe("fetch handler", () => {
       ctx3,
     );
     expect(ready.status).toBe(200);
-    expect(calls).toBe(1);
+    // One topstories request plus one item request, still a single refresh.
+    expect(calls).toBe(2);
   });
 
   it("serves raw and escaped JSON from KV without fetching HN", async () => {
     let calls = 0;
-    globalThis.fetch = async () => {
+    globalThis.fetch = firebaseFetch(() => {
       calls += 1;
-      return new Response(edgeHtml, { status: 200 });
-    };
+    });
     const logs = await runScheduled();
     expect(logs.some((line) => line.includes('"stories":'))).toBe(true);
     calls = 0;
@@ -168,7 +202,10 @@ describe("fetch handler", () => {
       JSON.stringify({ timestamp: "2020-01-01T00:00:00.000Z", stories: 1 }),
     );
     globalThis.fetch = async () =>
-      new Response("<html><body>rate limited</body></html>", { status: 200 });
+      new Response("[]", {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
 
     const logs = await runScheduled();
     expect(logs.some((line) => line.includes('"stories":0'))).toBe(true);
@@ -191,7 +228,9 @@ describe("fetch handler", () => {
       console.error = original;
     }
     expect(await env.HN_KV.get(KV_RAW)).toBe("[]");
-    expect(errors.some((line) => line.includes("HN responded with 503"))).toBe(true);
+    expect(errors.some((line) => line.includes("HN topstories responded with 503"))).toBe(
+      true,
+    );
   });
 
   it("rejects unknown routes and methods", async () => {

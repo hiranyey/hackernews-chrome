@@ -1,6 +1,6 @@
 # Hacker News Worker
 
-Cron-scraped replacement for the Fastify server in the repo root. The extension keeps calling `https://hn.hiranyey.dev/v2`. This Worker does not fetch Hacker News on the request path; a Cron Trigger refreshes a KV cache every two minutes.
+Replacement for the Fastify server in the repo root. The extension keeps calling `https://hn.hiranyey.dev/v2`. Refresh loads the top 30 stories from the Hacker News Firebase API (`https://hacker-news.firebaseio.com/v0/topstories.json` and `item/{id}.json`) because Cloudflare Worker egress receives HTTP 419 from the HTML front page. This Worker does not fetch Hacker News on the request path; a Cron Trigger refreshes a KV cache every two minutes.
 
 The Fastify server (`index.ts`), its Dockerfile, and `.github/workflows/docker-image.yml` stay as the fallback.
 
@@ -12,9 +12,9 @@ The Fastify server (`index.ts`), its Dockerfile, and `.github/workflows/docker-i
 | `GET /v2` | Raw JSON array |
 | `GET /health` | `{ "timestamp": "<ISO-8601>", "stories": <count> }` |
 
-Each story is `{ "id", "title", "url", "points", "user", "comment" }`, all strings. Relative links such as `item?id=123` are resolved against `https://news.ycombinator.com/`. `javascript:` and other non-http(s) URLs become `""`. Job posts, which have no `.subline`, keep empty `points`, `user`, and `comment`.
+Each story is `{ "id", "title", "url", "points", "user", "comment" }`, all strings. A story whose Firebase `url` is not `http:` or `https:` (Ask HN and other self posts) uses `https://news.ycombinator.com/item?id=<id>`. Job posts keep empty `points`, `user`, and `comment`. Comment text matches the old subline: `discuss`, `1\u00a0comment`, or `N\u00a0comments`.
 
-`/` and `/v2` send `Access-Control-Allow-Origin: *`, `Content-Type: application/json; charset=utf-8`, and `Cache-Control: public, max-age=60`. Before the first successful scrape both return `503` with `Retry-After: 10` and `{ "error": "Stories not loaded yet" }`. A page with zero stories does not overwrite the last good copy.
+`/` and `/v2` send `Access-Control-Allow-Origin: *`, `Content-Type: application/json; charset=utf-8`, and `Cache-Control: public, max-age=60`. Before the first successful refresh both return `503` with `Retry-After: 10` and `{ "error": "Stories not loaded yet" }`. A response with zero stories does not overwrite the last good copy.
 
 `/` escapes `& < > " '` as `&amp; &lt; &gt; &quot; &#39;`, matching `escape-html`.
 
@@ -36,7 +36,7 @@ Binding name: **`HN_KV`**.
 - `compatibility_flags`: `["nodejs_compat"]` (set in Wrangler config; the bundle does not import Node built-ins)
 - Cron: `*/2 * * * *` (every 2 minutes, UTC)
 
-Workers Logs and traces are enabled in `wrangler.jsonc` (`observability.logs` and `observability.traces`, both sampled at 1). Each refresh logs JSON with a `stories` count. A zero-story page and a thrown fetch error are logged and leave KV unchanged.
+Workers Logs and traces are enabled in `wrangler.jsonc` (`observability.logs` and `observability.traces`, both sampled at 1). Each refresh logs JSON with a `stories` count. A zero-story response and a thrown fetch error are logged and leave KV unchanged.
 
 ## Build
 
@@ -54,7 +54,7 @@ npm test
 npm run typecheck
 ```
 
-Tests check the HTMLRewriter parser and escaper against the cheerio loop in the root `index.ts`, using `fixtures/frontpage.html` (a saved front page, including a Launch HN relative link) and `fixtures/edge-cases.html` (a job post taken from `/jobs`, an Ask HN relative link, and non-http URLs). Regenerate the cheerio oracle with `npm run fixtures`.
+Tests check the HTMLRewriter parser and escaper against the cheerio loop in the root `index.ts`, using `fixtures/frontpage.html` (a saved front page, including a Launch HN relative link) and `fixtures/edge-cases.html` (a job post taken from `/jobs`, an Ask HN relative link, and non-http URLs). Regenerate the cheerio oracle with `npm run fixtures`. `test/hn-api-mapper.spec.ts` checks the Firebase item mapper: every field is a string, and comment text matches the old subline (`discuss`, `1\u00a0comment`, `N\u00a0comments`).
 
 ## Deploy with Wrangler
 

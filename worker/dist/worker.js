@@ -1,94 +1,13 @@
-// src/constants.ts
-var HN_URL = "https://news.ycombinator.com/";
+// HN Worker — Firebase API refresh (HTML scrape blocked with 419 from CF egress)
 var FETCH_TIMEOUT_MS = 1e4;
 var KV_RAW = "raw";
 var KV_ESCAPED = "escaped";
 var KV_META = "meta";
+var HN_TOP_URL = "https://hacker-news.firebaseio.com/v0/topstories.json";
+var HN_ITEM_URL = "https://hacker-news.firebaseio.com/v0/item/";
+var HN_ITEM_PAGE = "https://news.ycombinator.com/item?id=";
+var STORY_LIMIT = 30;
 
-// src/parse.ts
-function safeURL(href) {
-  try {
-    const url = new URL(href, HN_URL);
-    return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
-  } catch {
-    return "";
-  }
-}
-var NAMED_ENTITIES = {
-  amp: "&",
-  AMP: "&",
-  lt: "<",
-  LT: "<",
-  gt: ">",
-  GT: ">",
-  quot: '"',
-  QUOT: '"',
-  apos: "'",
-  nbsp: "\xA0",
-  hellip: "\u2026",
-  mdash: "\u2014",
-  ndash: "\u2013",
-  lsquo: "\u2018",
-  rsquo: "\u2019",
-  ldquo: "\u201C",
-  rdquo: "\u201D",
-  copy: "\xA9",
-  reg: "\xAE",
-  trade: "\u2122",
-  bull: "\u2022",
-  middot: "\xB7",
-  times: "\xD7",
-  divide: "\xF7"
-};
-var WINDOWS_1252 = {
-  128: "\u20AC",
-  130: "\u201A",
-  131: "\u0192",
-  132: "\u201E",
-  133: "\u2026",
-  134: "\u2020",
-  135: "\u2021",
-  136: "\u02C6",
-  137: "\u2030",
-  138: "\u0160",
-  139: "\u2039",
-  140: "\u0152",
-  142: "\u017D",
-  145: "\u2018",
-  146: "\u2019",
-  147: "\u201C",
-  148: "\u201D",
-  149: "\u2022",
-  150: "\u2013",
-  151: "\u2014",
-  152: "\u02DC",
-  153: "\u2122",
-  154: "\u0161",
-  155: "\u203A",
-  156: "\u0153",
-  158: "\u017E",
-  159: "\u0178"
-};
-function decodeNumericReference(body) {
-  const hex = body[1] === "x" || body[1] === "X";
-  const codePoint = hex ? Number.parseInt(body.slice(2), 16) : Number.parseInt(body.slice(1), 10);
-  if (!Number.isInteger(codePoint) || codePoint < 0 || codePoint > 1114111) {
-    return "\uFFFD";
-  }
-  if (codePoint === 0 || codePoint >= 55296 && codePoint <= 57343) {
-    return "\uFFFD";
-  }
-  return WINDOWS_1252[codePoint] ?? String.fromCodePoint(codePoint);
-}
-function decodeHTML(value) {
-  return value.replace(
-    /&(#x[0-9a-fA-F]+|#[0-9]+|[A-Za-z][A-Za-z0-9]+);/g,
-    (entity, body) => {
-      if (body[0] === "#") return decodeNumericReference(body);
-      return NAMED_ENTITIES[body] ?? entity;
-    }
-  );
-}
 var ESCAPE_HTML_PATTERN = /[&<>"']/g;
 var ESCAPE_HTML_MAP = {
   "&": "&amp;",
@@ -110,159 +29,99 @@ function escapeNews(news) {
     comment: escapeHTML(news.comment)
   };
 }
-function blankStory(id) {
+
+/** Match HN subline comment link text: "discuss" | "1\u00a0comment" | "N\u00a0comments" */
+function formatComment(descendants) {
+  var n = typeof descendants === "number" ? descendants : 0;
+  if (n <= 0) return "discuss";
+  if (n === 1) return "1\u00a0comment";
+  return String(n) + "\u00a0comments";
+}
+
+function storyUrl(item) {
+  var url = item.url;
+  if (typeof url === "string" && /^https?:/i.test(url)) return url;
+  return HN_ITEM_PAGE + item.id;
+}
+
+/** Map a Firebase item to the News shape (all fields strings). */
+function mapItem(item) {
+  if (!item || item.deleted || item.dead) return null;
+  // Skip non-story types that can appear in topstories (e.g. job without score)
+  if (item.type && item.type !== "story" && item.type !== "job") return null;
+  var id = String(item.id);
+  var points = item.score == null ? "" : String(item.score);
+  var user = item.by == null ? "" : String(item.by);
+  var comment = item.type === "job" ? "" : formatComment(item.descendants);
+  // Jobs on the front page have no subline in the HTML scrape.
+  if (item.type === "job") {
+    points = "";
+    user = "";
+    comment = "";
+  }
   return {
     id,
-    title: "",
-    // Cheerio always runs safeURL(titleLink.attr("href") || ""). With no
-    // title anchor that is safeURL(""), which resolves to the HN origin.
-    url: safeURL(""),
-    points: "",
-    user: "",
-    comment: "",
-    titleCaptured: false,
-    scoreCaptured: false,
-    userCaptured: false
+    title: item.title == null ? "" : String(item.title),
+    url: storyUrl(item),
+    points,
+    user,
+    comment
   };
 }
-function toNews(story) {
-  return {
-    id: story.id,
-    title: story.title,
-    url: story.url,
-    points: story.points,
-    user: story.user,
-    comment: story.comment
-  };
-}
-function classListHas(classAttribute, name) {
-  if (!classAttribute) return false;
-  return classAttribute.split(/\s+/).includes(name);
-}
-async function parseStories(html) {
-  const stories = [];
-  let current = null;
-  let awaitingSub = false;
-  let titleBuf = "";
-  let capturingTitle = false;
-  let scoreBuf = "";
-  let capturingScore = false;
-  let userBuf = "";
-  let capturingUser = false;
-  let commentBuf = "";
-  let capturingComment = false;
-  function flush() {
-    if (!current) return;
-    stories.push(toNews(current));
-    current = null;
-    awaitingSub = false;
-  }
-  const rewriter = new HTMLRewriter().on("tr.athing", {
-    element(element) {
-      if (current) flush();
-      current = blankStory(decodeHTML(element.getAttribute("id") || ""));
-      awaitingSub = false;
-      element.onEndTag(() => {
-        awaitingSub = true;
-      });
-    }
-  }).on("tr", {
-    element(element) {
-      if (!current || !awaitingSub) return;
-      if (classListHas(element.getAttribute("class"), "athing")) return;
-      awaitingSub = false;
-      element.onEndTag(() => {
-        flush();
-      });
-    }
-  }).on(".titleline > a", {
-    element(element) {
-      if (!current || current.titleCaptured) return;
-      current.titleCaptured = true;
-      current.url = safeURL(decodeHTML(element.getAttribute("href") || ""));
-      titleBuf = "";
-      capturingTitle = true;
-      element.onEndTag(() => {
-        if (current) current.title = decodeHTML(titleBuf);
-        capturingTitle = false;
-      });
-    },
-    text(text) {
-      if (capturingTitle) titleBuf += text.text;
-    }
-  }).on(".subline .score", {
-    element(element) {
-      if (!current || current.scoreCaptured) return;
-      current.scoreCaptured = true;
-      scoreBuf = "";
-      capturingScore = true;
-      element.onEndTag(() => {
-        if (current) current.points = decodeHTML(scoreBuf).split(" ")[0] ?? "";
-        capturingScore = false;
-      });
-    },
-    text(text) {
-      if (capturingScore) scoreBuf += text.text;
-    }
-  }).on(".subline .hnuser", {
-    element(element) {
-      if (!current || current.userCaptured) return;
-      current.userCaptured = true;
-      userBuf = "";
-      capturingUser = true;
-      element.onEndTag(() => {
-        if (current) current.user = decodeHTML(userBuf);
-        capturingUser = false;
-      });
-    },
-    text(text) {
-      if (capturingUser) userBuf += text.text;
-    }
-  }).on(".subline a", {
-    element(element) {
-      if (!current) return;
-      const href = decodeHTML(element.getAttribute("href") || "");
-      if (href !== `item?id=${current.id}`) return;
-      commentBuf = "";
-      capturingComment = true;
-      element.onEndTag(() => {
-        if (current) current.comment = decodeHTML(commentBuf);
-        capturingComment = false;
-      });
-    },
-    text(text) {
-      if (capturingComment) commentBuf += text.text;
-    }
-  }).onDocument({
-    end() {
-      if (current) flush();
-    }
+
+async function fetchStories() {
+  var topRes = await fetch(HN_TOP_URL, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
   });
-  await rewriter.transform(new Response(html)).arrayBuffer();
+  if (!topRes.ok) {
+    var topBody = (await topRes.text()).slice(0, 200);
+    console.error(JSON.stringify({
+      message: "HN topstories non-2xx",
+      status: topRes.status,
+      body: topBody
+    }));
+    throw new Error("HN topstories responded with " + topRes.status);
+  }
+  var ids = await topRes.json();
+  if (!Array.isArray(ids)) throw new Error("HN topstories returned non-array");
+  var first = ids.slice(0, STORY_LIMIT);
+  var items = await Promise.all(first.map(async (id) => {
+    var r = await fetch(HN_ITEM_URL + id + ".json", {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
+    });
+    if (!r.ok) {
+      var body = (await r.text()).slice(0, 200);
+      console.error(JSON.stringify({
+        message: "HN item non-2xx",
+        id,
+        status: r.status,
+        body
+      }));
+      return null;
+    }
+    return r.json();
+  }));
+  var stories = [];
+  for (var i = 0; i < items.length; i++) {
+    var mapped = mapItem(items[i]);
+    if (mapped) stories.push(mapped);
+  }
   return stories;
 }
 
-// src/refresh.ts
 var inflight = null;
 var lastColdStartMs = 0;
 var COLD_START_COOLDOWN_MS = 1e4;
+
 async function refreshHN(env) {
   try {
-    const response = await fetch(HN_URL, {
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
-    });
-    if (!response.ok) {
-      throw new Error(`HN responded with ${response.status}`);
-    }
-    const data = await parseStories(await response.text());
-    console.log(
-      JSON.stringify({
-        message: data.length === 0 ? "HN returned no stories, keeping cached data" : "Refreshed HN data",
-        stories: data.length
-      })
-    );
+    var data = await fetchStories();
+    console.log(JSON.stringify({
+      message: data.length === 0 ? "HN returned no stories, keeping cached data" : "Refreshed HN data",
+      stories: data.length
+    }));
     if (data.length === 0) return;
-    const meta = {
+    var meta = {
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
       stories: data.length
     };
@@ -270,14 +129,13 @@ async function refreshHN(env) {
     await env.HN_KV.put(KV_ESCAPED, JSON.stringify(data.map(escapeNews)));
     await env.HN_KV.put(KV_META, JSON.stringify(meta));
   } catch (err) {
-    console.error(
-      JSON.stringify({
-        message: "Failed to refresh HN data",
-        error: err instanceof Error ? err.message : String(err)
-      })
-    );
+    console.error(JSON.stringify({
+      message: "Failed to refresh HN data",
+      error: err instanceof Error ? err.message : String(err)
+    }));
   }
 }
+
 function startRefresh(env) {
   if (!inflight) {
     inflight = refreshHN(env).finally(() => {
@@ -286,18 +144,18 @@ function startRefresh(env) {
   }
   return inflight;
 }
+
 function kickoffIfEmpty(env, ctx) {
   if (inflight) {
     ctx.waitUntil(inflight);
     return;
   }
-  const now = Date.now();
+  var now = Date.now();
   if (now - lastColdStartMs < COLD_START_COOLDOWN_MS) return;
   lastColdStartMs = now;
   ctx.waitUntil(startRefresh(env));
 }
 
-// src/index.ts
 var JSON_HEADERS = {
   "Content-Type": "application/json; charset=utf-8",
   "Access-Control-Allow-Origin": "*"
@@ -326,18 +184,16 @@ async function readKey(env, key) {
   try {
     return await env.HN_KV.get(key);
   } catch (err) {
-    console.error(
-      JSON.stringify({
-        message: "KV read failed",
-        key,
-        error: err instanceof Error ? err.message : String(err)
-      })
-    );
+    console.error(JSON.stringify({
+      message: "KV read failed",
+      key,
+      error: err instanceof Error ? err.message : String(err)
+    }));
     return void 0;
   }
 }
 async function cachedJson(request, env, ctx, key, cacheControl) {
-  const stored = await readKey(env, key);
+  var stored = await readKey(env, key);
   if (stored === void 0) return notReady();
   if (stored === null) {
     kickoffIfEmpty(env, ctx);
@@ -361,7 +217,7 @@ async function cachedJson(request, env, ctx, key, cacheControl) {
   });
 }
 async function handleFetch(request, env, ctx) {
-  const { pathname } = new URL(request.url);
+  var { pathname } = new URL(request.url);
   if (request.method === "OPTIONS") return corsPreflight();
   if (request.method !== "GET" && request.method !== "HEAD") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
@@ -387,7 +243,7 @@ async function handleFetch(request, env, ctx) {
   });
 }
 async function handleScheduled(_controller, env, ctx) {
-  const run = startRefresh(env);
+  var run = startRefresh(env);
   ctx.waitUntil(run);
   await run;
 }

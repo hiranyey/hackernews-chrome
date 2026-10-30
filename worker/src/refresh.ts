@@ -1,12 +1,11 @@
 import {
-  FETCH_TIMEOUT_MS,
-  HN_URL,
   KV_ESCAPED,
   KV_META,
   KV_RAW,
   type Meta,
 } from "./constants.ts";
-import { escapeNews, parseStories } from "./parse.ts";
+import { escapeNews } from "./parse.ts";
+import { fetchStories } from "./hn-api.ts";
 
 let inflight: Promise<void> | null = null;
 let lastColdStartMs = 0;
@@ -17,13 +16,8 @@ const COLD_START_COOLDOWN_MS = 10_000;
 
 export async function refreshHN(env: Env): Promise<void> {
   try {
-    const response = await fetch(HN_URL, {
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    });
-    if (!response.ok) {
-      throw new Error(`HN responded with ${response.status}`);
-    }
-    const data = await parseStories(await response.text());
+    // Firebase API — HTML scrape returns 419 from Cloudflare egress IPs.
+    const data = await fetchStories();
     // Story count on every successful parse, including zero. A zero-story
     // page is usually an error or rate-limit document; keep the last good copy.
     console.log(
